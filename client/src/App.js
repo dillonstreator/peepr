@@ -148,6 +148,7 @@ function Peep({ name, status, publicKey, messages = [] }) {
 			username: name,
 			message: secret.encryptWith(message, publicKey),
 		});
+		setMessage("");
 	};
 
 	return (
