@@ -19,9 +19,7 @@ app.use((req, res, next) => {
 });
 
 app.use(helmet());
-app.use(cors({
-   origin: [/https?:\/\/localhost/i]
-}));
+app.use(cors());
 
 app.get("/health", (_, res) => res.status(200).send("Healthy"));
 

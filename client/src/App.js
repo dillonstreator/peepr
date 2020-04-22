@@ -2,14 +2,17 @@ import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import Toast from "toastr";
 import secret from "./utils/secret";
+import classnames from "classnames";
 
 import styles from "./styles.module.scss";
 
-const socket = io.connect("http://localhost:5000");
+const wsUrl = "http://localhost:5000";
+const socket = io.connect(wsUrl);
 secret.generateKeys();
 
 function App() {
 	const [search, setSearch] = useState("");
+	const [isChatRequesting, setIsChatRequesting] = useState(false);
 	const [user, setUser] = useState();
 	const [peeps, setPeeps] = useState([]);
 
@@ -50,16 +53,16 @@ function App() {
 			);
 		});
 		socket.on("chat_request_success", ({ username }) => {
+			setIsChatRequesting(false);
 			setPeeps((prevPeeps) => [
 				...prevPeeps,
 				{ name: username, status: "PENDING" },
 			]);
 		});
+		socket.on("chat_request_error", ({ username, error }) => {
+			setIsChatRequesting(false);
+		});
 		socket.on("chat_accept", ({ username, publicKey }) => {
-			// username accepted a chat request that I sent.. They send their publicKey along as well.. let's save that
-			console.log(
-				`${username} accepted a chat request that I sent. Their publicKey is ${publicKey}`
-			);
 			setPeeps((prevPeeps) => {
 				return prevPeeps
 					.filter(({ name }) => name != username)
@@ -72,14 +75,11 @@ function App() {
 			});
 		});
 		socket.on("chat_reject", ({ username }) => {
-			// username rejecteded a chat request that I sent..
-			console.log(`${username} rejected a chat request that I sent`);
 			setPeeps((prevPeeps) =>
 				prevPeeps.filter(({ name }) => name != username)
 			);
 		});
 		socket.on("message_receive", ({ username, message }) => {
-			console.log(`message received from ${username}: ${message}`);
 			setPeeps((prevPeeps) => {
 				return prevPeeps.reduce((acc, curr) => {
 					const isMessageSender = curr.name === username;
@@ -106,23 +106,32 @@ function App() {
 	}, []);
 
 	const requestChat = () => {
+		if (!search || isChatRequesting) return;
+
+		setSearch("");
+		setIsChatRequesting(true);
 		const publicKey = secret.keyToPem();
 
-		console.log(publicKey);
 		socket.emit("chat_request", { publicKey, username: search });
 	};
 
-	console.log("peeps", peeps);
+	const requestBtnClasses = classnames({
+		"button": true,
+		"is-primary": true,
+		"is-loading": isChatRequesting,
+		"is-disabled": isChatRequesting,
+	});
 	return (
 		<div className={styles.App}>
 			<div>
 				{user && <p>{user.name}</p>}
 				<input
+					className="input"
 					value={search}
 					placeholder="username"
 					onChange={({ target: { value } }) => setSearch(value)}
 				/>
-				<button onClick={requestChat}>request chat</button>
+				<button className={requestBtnClasses} onClick={requestChat}>request chat</button>
 			</div>
 			<PeepList peeps={peeps} />
 		</div>
@@ -143,7 +152,6 @@ function Peep({ name, status, publicKey, messages = [] }) {
 	const [message, setMessage] = useState("");
 
 	const sendMessage = () => {
-		console.log(`sending message to user ${name}: ${message}`);
 		socket.emit("message_send", {
 			username: name,
 			message: secret.encryptWith(message, publicKey),
@@ -159,13 +167,16 @@ function Peep({ name, status, publicKey, messages = [] }) {
 			{status === "ACCEPTED" && (
 				<>
 					<textarea
+						className="textarea"
 						value={message}
 						onChange={({ target: { value } }) => setMessage(value)}
 					></textarea>
-					<button onClick={sendMessage}>Send message</button>
-					{messages.map((m) => (
-						<p key={m}>{m}</p>
-					))}
+					<button className="button" onClick={sendMessage}>Send message</button>
+					<ul>
+						{messages.map((m) => (
+							<li key={m}>{m}</li>
+						))}
+					</ul>
 				</>
 			)}
 		</div>
