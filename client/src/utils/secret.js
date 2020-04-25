@@ -9,7 +9,6 @@ export default {
 			publicKey = keys.publicKey;
 			privateKey = keys.privateKey;
 			resolve();
-			window.document.querySelector("#loader").remove();
 		});
 	}),
 	keyToPem: () => window.forge.pki.publicKeyToPem(publicKey),
