@@ -1,0 +1,58 @@
+@import "../../assets/scss/colors.scss";
+
+.usernameWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 5px;
+    border-radius: 5px;
+    box-shadow: 3px 3px 5px darken($background-color, 5%),
+                -3px -3px 5px lighten($background-color, 5%);
+    margin-bottom: 30px;
+
+    & span {
+        color: rgba(145, 145, 145, 1);
+        margin-right: 5px;
+    }
+}
+
+.search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    & input {
+        margin-bottom: 10px;
+    }
+}
+
+.list {
+    padding: 30px 15px;
+    display: flex;
+    flex-direction: column;
+
+    & a {
+        text-decoration: none;
+        padding: 10px;
+        background-color: darken($background-color, 5%);
+
+        &:hover {
+            background-color: darken($background-color, 7%)
+        }
+        
+        &:nth-child(even) {
+            background-color: $background-color;
+
+            &:hover {
+                background-color: darken($background-color, 2%)
+            }
+        }
+
+        & code {
+            color: black;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    }
+}

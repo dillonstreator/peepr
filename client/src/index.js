@@ -5,6 +5,11 @@ import "./assets/scss/global.scss";
 import "toastr/build/toastr.min.css"
 import 'jquery'
 import * as serviceWorker from "./serviceWorker";
+import toastr from 'toastr';
+
+toastr.options = {
+    positionClass: "toast-bottom-right"
+}
 
 ReactDOM.render(<App />, document.getElementById("root"));
 

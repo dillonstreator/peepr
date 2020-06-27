@@ -1,5 +1,7 @@
 const logger = require("./utils/logger");
 
+const { CHAT_STATUSES } = require("./client/src/constants");
+
 const {
 	uniqueNamesGenerator,
 	adjectives,
@@ -17,7 +19,6 @@ const nameGenerator = () =>
 const users = {};
 
 /*
-
 users = {
 	'dillon': {
 		name: 'dillon',
@@ -26,7 +27,7 @@ users = {
 		chats: {
 			'shane': {
 				user: {}, // points to shane from below
-				status: "PENDING"
+				status: CHAT_STATUSES.PENDING
 			}
 		}
 	}
@@ -37,19 +38,17 @@ users = {
 		chats: {
 			'dillon': {
 				user: {}, // points to dillon from above
-				status: "PENDING"
+				status: CHAT_STATUSES.PENDING
 			}
 		}
 	}
 }
-
-
 */
 
 module.exports = (io) => {
 	io.on("connection", (socket) => {
 		logger.info("new connection");
-		logger.info("handshake:", socket.handshake.query)
+		logger.info("handshake:", socket.handshake.query);
 
 		const name = nameGenerator();
 		const user = {
@@ -74,11 +73,11 @@ module.exports = (io) => {
 			}
 			user.chats[otherUsername] = {
 				user: userRequested,
-				status: "PENDING",
+				status: CHAT_STATUSES.PENDING,
 			}
 			users[otherUsername].chats[user.name] = {
 				user,
-				status: "PENDING",
+				status: CHAT_STATUSES.PENDING,
 			}
 
 			socket.emit('chat_request_success', { username: otherUsername });
@@ -94,8 +93,8 @@ module.exports = (io) => {
 				return socket.emit("chat_accept_error", { username });
 			}
 
-			user.chats[username].status = "ACCEPTED";
-			users[username].chats[user.name].status = "ACCEPTED";
+			user.chats[username].status = CHAT_STATUSES.ACCEPTED;
+			users[username].chats[user.name].status = CHAT_STATUSES.ACCEPTED;
 			io.to(userRequested.socketId).emit("chat_accept", {
 				username: user.name,
 				publicKey,

@@ -5,8 +5,7 @@ import secret from "./utils/secret";
 import { actions as chatActions } from "./ducks/chats";
 import { actions as userActions } from "./ducks/user";
 import { actions as uiActions } from "./ducks/ui";
-import constants from './constants';
-const { STATUSES } = constants;
+import { CHAT_STATUSES } from './constants';
 
 const wsUrl = "http://localhost:5000";
 let socket = null;
@@ -15,8 +14,11 @@ export default {
 	connect: function () {
 		if (socket) return;
 		socket = io.connect(wsUrl);
-		socket.on("user", (user) => store.dispatch(userActions.setUser(user)));
+		socket.on("user", (user) => {
+			store.dispatch(userActions.setUser(user));
+		});
 		socket.on("chat_request", ({ username, publicKey }) => {
+			let accepted = false;
 			Toast.info(
 				`${username} wants to chat. Click to accept.`,
 				"Chat Request",
@@ -28,7 +30,12 @@ export default {
 					onCloseClick: () => {
 						socket.emit("chat_reject", { username });
 					},
+					onHidden: () => {
+						if (accepted) return;
+						socket.emit("chat_reject", { username });
+					},
 					onclick: () => {
+						accepted = true;
 						socket.emit("chat_accept", {
 							username,
 							publicKey: secret.keyToPem(),
@@ -41,7 +48,7 @@ export default {
 		socket.on("chat_request_success", ({ username }) => {
 			store.dispatch(uiActions.setRequestChatInProgress(false));
 			store.dispatch(
-				chatActions.updateChat({ username, status: STATUSES.PENDING })
+				chatActions.updateChat({ username, status: CHAT_STATUSES.PENDING })
 			);
 		});
 		socket.on("chat_request_error", ({ username, error }) => {
@@ -55,7 +62,7 @@ export default {
 				chatActions.setChat({
 					username,
 					publicKey: secret.pemToKey(publicKey),
-					status: STATUSES.ACCEPTED,
+					status: CHAT_STATUSES.ACCEPTED,
 					messages: [],
 				})
 			);
@@ -68,18 +75,22 @@ export default {
 			store.dispatch(
 				chatActions.addMessage({
 					username,
-					message: secret.decrypt(message),
+					message: {
+						createdAt: new Date(),
+						author: username,
+						text: secret.decrypt(message),
+					},
 				})
 			);
 		});
 		socket.on("chat_disconnect", ({ username }) => {
 			store.dispatch(
 				chatActions.updateChat({
-					status: STATUSES.DISCONNECTED,
+					status: CHAT_STATUSES.DISCONNECTED,
 				})
 			);
 			Toast.info(
-				`${username} disconnected from peepr... :(`,
+				`${username} disconnected`,
 				"User Disconnected"
 			);
 		});

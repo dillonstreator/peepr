@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Home from './pages/Home/Home';
 import store from './store';
 
-import styles from "./styles.module.scss";
+import styles from "./app.module.scss";
 
 const Chats = React.lazy(() => import('./pages/Chats/Chats'));
 const ChatsLazy = (props) => (<Suspense fallback={<div>Loading...</div>}><Chats {...props} /></Suspense>)

@@ -6,6 +6,8 @@ import { actions as uiActions } from "../../ducks/ui";
 import socket from "../../socket";
 import secret from "../../utils/secret";
 
+import styles from './chats.module.scss';
+
 socket.connect();
 secret.generateKeys();
 
@@ -32,24 +34,31 @@ const Chats = ({
 	});
 	return (
 		<div>
-			{user && <p>{user.name}</p>}
-			<input
-				className="input"
-				value={search}
-				placeholder="username"
-				onChange={({ target: { value } }) => setSearch(value)}
-			/>
-			<button className={requestBtnClasses} onClick={requestChat}>
-				request chat
-			</button>
-			<div className="list is-hoverable">
+			{user && (
+				<div className={styles.usernameWrapper}>
+					<h3><span>You are</span> <code>{user.name}</code></h3>
+				</div>
+			)}
+			<div className={styles.search}>
+				<label>
+					Username
+				</label>
+				<input
+					value={search}
+					onChange={({ target: { value } }) => setSearch(value)}
+				/>
+				<button className={requestBtnClasses} onClick={requestChat}>
+					Request Chat
+				</button>
+			</div>
+			<div className={styles.list}>
 				{Object.values(chats).map(({ username }) => (
 					<Link
-						className="list-item"
+						className={styles.item}
 						key={username}
 						to={`/chats/${username}`}
 					>
-						{username}
+						<code>{username}</code>
 					</Link>
 				))}
 			</div>
