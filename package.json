@@ -8,7 +8,7 @@
     "client": "cd client && npm start",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "installall": "npm install && cd client && npm install && cd ..",
-    "prestart": "npm run installall && cd client && npm run build",
+    "build": "cd client && npm run build && cd ..",
     "start": "cross-env NODE_ENV=production node server.js",
     "heroku-postbuild": "cd client && npm install && npm install --only=dev --no-shrinkwrap && npm run build",
     "deploy:heroku": "git push heroku master"
