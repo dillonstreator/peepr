@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 import moment from 'moment';
@@ -11,6 +11,11 @@ import styles from './chat.module.scss';
 
 const Chat = ({ chat, addMessage }) => {
 	const [message, setMessage] = useState("");
+	const messagesRef = useRef();
+
+	useEffect(() => {
+		messagesRef.current.scrollTop = messagesRef.current.scrollHeight
+	}, [chat.messages]);
 
 	if (!chat) return <Redirect to="/chats" />;
 
@@ -36,7 +41,7 @@ const Chat = ({ chat, addMessage }) => {
 		<div>
 			<Link to="/chats">Back</Link>
 			<h2>{username}</h2>
-			<div className={styles.messages}>
+			<div className={styles.messages} ref={messagesRef}>
 				{messages.map((msg, i) => <Message key={i} {...msg} />)}
 			</div>
 			<div className={styles.input}>
