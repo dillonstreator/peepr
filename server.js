@@ -9,5 +9,5 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 server.listen(PORT);
 
-const io = require("socket.io")(server);
+const io = require("socket.io")(server, { path: "/peepr/socket.io" });
 require("./events")(io);

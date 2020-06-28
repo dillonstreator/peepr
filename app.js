@@ -25,7 +25,7 @@ app.use(cors());
 app.get("/health", (_, res) => res.status(200).send("Healthy"));
 
 if (process.env.NODE_ENV === "production") {
-   app.use(express.static(path.join(__dirname, "client", "build")));
+   app.use("/peepr", express.static(path.join(__dirname, "client", "build")));
 
    app.get("*", (_, res) => {
       res.sendFile(path.join(__dirname, "client", "build", "index.html"));
