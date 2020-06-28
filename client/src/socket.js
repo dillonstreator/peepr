@@ -7,7 +7,7 @@ import { actions as userActions } from "./ducks/user";
 import { actions as uiActions } from "./ducks/ui";
 import { CHAT_STATUSES } from './constants';
 
-const wsUrl = "http://localhost:5000";
+const wsUrl = process.env === "production" ? process.env.PUBLIC_URL : "http://localhost:5000";
 let socket = null;
 
 export default {
