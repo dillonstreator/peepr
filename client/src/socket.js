@@ -7,13 +7,20 @@ import { actions as userActions } from "./ducks/user";
 import { actions as uiActions } from "./ducks/ui";
 import { CHAT_STATUSES } from './constants';
 
-const wsUrl = process.env.REACT_APP_ENVIRONMENT === "production" ? "/peepr" : "http://localhost:5000";
+const wsUrl = process.env.REACT_APP_ENVIRONMENT === "production" ? "/" : "http://localhost:5000";
 let socket = null;
+
+let config;
+if (process.env.REACT_APP_ENVIRONMENT === "production") {
+	config = {
+		path: "/peepr/socket.io"
+	}
+}
 
 export default {
 	connect: function () {
 		if (socket) return;
-		socket = io.connect(wsUrl, { path: "/peepr/socket.io" });
+		socket = io.connect(wsUrl, config);
 		socket.on("user", (user) => {
 			store.dispatch(userActions.setUser(user));
 		});
