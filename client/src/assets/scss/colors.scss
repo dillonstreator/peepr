@@ -1,1 +1,5 @@
-$background-color: darken(#fff, 5%);
+$dark: #222;
+$light: #fdfdfd;
+
+
+$background-color: darken($light, 5%);

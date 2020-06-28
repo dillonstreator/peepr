@@ -12,14 +12,24 @@ body {
 	padding: 0;
 }
 
+section {
+	padding: 30px 15px;
+}
+
 input,
-button {
+button,
+.button {
 	padding: 5px;
 	border-radius: 5px;
 }
 
-button {
+button, .button {
 	cursor: pointer;
+	text-decoration: none;
+	border: 1px solid $dark;
+	color: $dark;
+	font-size: 1.2rem;
+	font-weight: 600;
 
 	&:hover {
 		background-color: darken($background-color, 5%);
